@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-// A Bidirectional streaming RPC.
+// A Unary streaming RPC.
 package unary;
 
 message InventoryRecord {

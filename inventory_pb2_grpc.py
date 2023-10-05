@@ -5,9 +5,8 @@ import grpc
 import inventory_pb2 as inventory__pb2
 
 
-class SearchByIDStub(object):
-    """1.
-    """
+class InventoryServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -15,44 +14,106 @@ class SearchByIDStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetServerResponse = channel.unary_unary(
-                '/unary.SearchByID/GetServerResponse',
-                request_serializer=inventory__pb2.Message.SerializeToString,
-                response_deserializer=inventory__pb2.MessageResponse.FromString,
+        self.searchByID = channel.unary_unary(
+                '/unary.InventoryService/searchByID',
+                request_serializer=inventory__pb2.InventoryRequest.SerializeToString,
+                response_deserializer=inventory__pb2.InventoryRecord.FromString,
+                )
+        self.search = channel.unary_unary(
+                '/unary.InventoryService/search',
+                request_serializer=inventory__pb2.InventorySearchRequest.SerializeToString,
+                response_deserializer=inventory__pb2.InventoryRecord.FromString,
+                )
+        self.searchRange = channel.unary_stream(
+                '/unary.InventoryService/searchRange',
+                request_serializer=inventory__pb2.InventoryRangeRequest.SerializeToString,
+                response_deserializer=inventory__pb2.InventoryRecord.FromString,
+                )
+        self.getDistribution = channel.unary_unary(
+                '/unary.InventoryService/getDistribution',
+                request_serializer=inventory__pb2.DistributionRequest.SerializeToString,
+                response_deserializer=inventory__pb2.DistributionResponse.FromString,
+                )
+        self.update = channel.unary_unary(
+                '/unary.InventoryService/update',
+                request_serializer=inventory__pb2.UpdateRequest.SerializeToString,
+                response_deserializer=inventory__pb2.UpdateResponse.FromString,
                 )
 
 
-class SearchByIDServicer(object):
-    """1.
-    """
+class InventoryServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
 
-    def GetServerResponse(self, request, context):
+    def searchByID(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def search(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def searchRange(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def getDistribution(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def update(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_SearchByIDServicer_to_server(servicer, server):
+def add_InventoryServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetServerResponse': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetServerResponse,
-                    request_deserializer=inventory__pb2.Message.FromString,
-                    response_serializer=inventory__pb2.MessageResponse.SerializeToString,
+            'searchByID': grpc.unary_unary_rpc_method_handler(
+                    servicer.searchByID,
+                    request_deserializer=inventory__pb2.InventoryRequest.FromString,
+                    response_serializer=inventory__pb2.InventoryRecord.SerializeToString,
+            ),
+            'search': grpc.unary_unary_rpc_method_handler(
+                    servicer.search,
+                    request_deserializer=inventory__pb2.InventorySearchRequest.FromString,
+                    response_serializer=inventory__pb2.InventoryRecord.SerializeToString,
+            ),
+            'searchRange': grpc.unary_stream_rpc_method_handler(
+                    servicer.searchRange,
+                    request_deserializer=inventory__pb2.InventoryRangeRequest.FromString,
+                    response_serializer=inventory__pb2.InventoryRecord.SerializeToString,
+            ),
+            'getDistribution': grpc.unary_unary_rpc_method_handler(
+                    servicer.getDistribution,
+                    request_deserializer=inventory__pb2.DistributionRequest.FromString,
+                    response_serializer=inventory__pb2.DistributionResponse.SerializeToString,
+            ),
+            'update': grpc.unary_unary_rpc_method_handler(
+                    servicer.update,
+                    request_deserializer=inventory__pb2.UpdateRequest.FromString,
+                    response_serializer=inventory__pb2.UpdateResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'unary.SearchByID', rpc_method_handlers)
+            'unary.InventoryService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class SearchByID(object):
-    """1.
-    """
+class InventoryService(object):
+    """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GetServerResponse(request,
+    def searchByID(request,
             target,
             options=(),
             channel_credentials=None,
@@ -62,8 +123,76 @@ class SearchByID(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/unary.SearchByID/GetServerResponse',
-            inventory__pb2.Message.SerializeToString,
-            inventory__pb2.MessageResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/unary.InventoryService/searchByID',
+            inventory__pb2.InventoryRequest.SerializeToString,
+            inventory__pb2.InventoryRecord.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def search(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/unary.InventoryService/search',
+            inventory__pb2.InventorySearchRequest.SerializeToString,
+            inventory__pb2.InventoryRecord.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def searchRange(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/unary.InventoryService/searchRange',
+            inventory__pb2.InventoryRangeRequest.SerializeToString,
+            inventory__pb2.InventoryRecord.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def getDistribution(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/unary.InventoryService/getDistribution',
+            inventory__pb2.DistributionRequest.SerializeToString,
+            inventory__pb2.DistributionResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def update(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/unary.InventoryService/update',
+            inventory__pb2.UpdateRequest.SerializeToString,
+            inventory__pb2.UpdateResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
