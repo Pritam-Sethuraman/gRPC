@@ -9,8 +9,10 @@ message InventoryRecord {
   string Description = 3;
   double Price = 4;
   int32 Quantity_in_Stock = 5;
-  int32 Quantity_in_Reorder = 6;
-  bool Discontinued = 7;
+  int32 Inventory_Value = 6;
+  int32 Reorder_Level = 7;
+  int32 Quantity_in_Reorder = 8;
+  bool Discontinued = 9;
 }
 
 message InventoryRequest {
