@@ -39,20 +39,18 @@ def run():
             if choice == '1':
                 inventory_id = input("Enter the Inventory ID to search: ")
 
-                # Search for the Inventory ID in the local data
-                found_inventory = next((item for item in inventory_data if item['Inventory_ID'] == inventory_id), None)
+                # Initialize variables for timing and response times
+                total_time = 0
+                num_calls = 100
 
-                # ...
-
-                if found_inventory:
-                    print("\nFound in local data:")
-                    print("Local data details:")
-                    for key, value in found_inventory.items():
-                        print(f"{key}: {value}")
+                for _ in range(num_calls):
+                    start_time = time()  # Start timing
 
                     # Search for the Inventory ID on the gRPC server
                     try:
                         response = stub.searchByID(inventory_pb2.InventoryRequest(id=inventory_id))
+                        end_time = time()  # End timing
+
                         if response.Inventory_ID:
                             print("\nResult from gRPC server:")
                             print("gRPC server response details:")
@@ -63,101 +61,317 @@ def run():
                             print(f"Quantity_in_Stock: {response.Quantity_in_Stock}")
                             print(f"Quantity_in_Reorder: {response.Quantity_in_Reorder}")
                             print(f"Discontinued: {response.Discontinued}")
-                        else:
-                            print(f"Error: {response}")
+
+                        # Calculate and log the response time
+                        response_time = end_time - start_time
+                        total_time += response_time
+                        print(f"Response time: {response_time} seconds")
                     except grpc.RpcError as e:
                         # Handle NOT_FOUND error
                         if e.code() == grpc.StatusCode.NOT_FOUND:
                             print("Inventory ID", inventory_id, "not found on the gRPC server.")
                         else:
                             print(f"Error: {e}")
-                else:
-                    print("Inventory ID", inventory_id, "not found in the local data.")
+
+                # Calculate and print the average response time
+                average_response_time = total_time / num_calls
+                print(f"Average Response Time for {num_calls} calls: {average_response_time} seconds")
+
+                # Log the results
+                with open("log_file.txt", "a") as log_file:
+                    log_file.write(
+                        f"Search by ID - Average Response Time for {num_calls} calls: {average_response_time} seconds\n")
+                    log_file.write("---------------------------------------------------\n")
 
 
             elif choice == '2':
+
                 key_name = input("Enter the key name: ")
+
                 key_value = input("Enter the key value: ")
-                try:
-                    response = stub.search(inventory_pb2.InventorySearchRequest(key_name=key_name, key_value=key_value))
-                    if response.Inventory_ID:
-                        print("\nResult from gRPC server:")
-                        print("gRPC server response details:")
-                        print(f"Inventory_ID: {response.Inventory_ID}")
-                        print(f"Name: {response.Name}")
-                        print(f"Description: {response.Description}")
-                        print(f"Price: {response.Price}")
-                        print(f"Quantity_in_Stock: {response.Quantity_in_Stock}")
-                        print(f"Quantity_in_Reorder: {response.Quantity_in_Reorder}")
-                        print(f"Discontinued: {response.Discontinued}")
-                    else:
-                        print(f"Error: {response}")
-                except grpc.RpcError as e:
-                    # Handle NOT_FOUND error
-                    if e.code() == grpc.StatusCode.NOT_FOUND:
-                        print(f"Key '{key_name}' with value '{key_value}' not found on the gRPC server.")
-                    else:
-                        print(f"Error: {e}")
+
+                # Initialize variables for timing and response times
+
+                total_time = 0
+
+                num_calls = 100
+
+                for _ in range(num_calls):
+
+                    start_time = time()  # Start timing
+
+                    try:
+
+                        response = stub.search(
+                            inventory_pb2.InventorySearchRequest(key_name=key_name, key_value=key_value))
+
+                        end_time = time()  # End timing
+
+                        if response.Inventory_ID:
+                            print("\nResult from gRPC server:")
+
+                            print("gRPC server response details:")
+
+                            print(f"Inventory_ID: {response.Inventory_ID}")
+
+                            print(f"Name: {response.Name}")
+
+                            print(f"Description: {response.Description}")
+
+                            print(f"Price: {response.Price}")
+
+                            print(f"Quantity_in_Stock: {response.Quantity_in_Stock}")
+
+                            print(f"Quantity_in_Reorder: {response.Quantity_in_Reorder}")
+
+                            print(f"Discontinued: {response.Discontinued}")
+
+                        # Calculate and log the response time
+
+                        response_time = end_time - start_time
+
+                        total_time += response_time
+
+                        print(f"Response time: {response_time} seconds")
+
+                    except grpc.RpcError as e:
+
+                        # Handle NOT_FOUND error
+
+                        if e.code() == grpc.StatusCode.NOT_FOUND:
+
+                            print(f"Key '{key_name}' with value '{key_value}' not found on the gRPC server.")
+
+                        else:
+
+                            print(f"Error: {e}")
+
+                # Calculate and print the average response time
+
+                average_response_time = total_time / num_calls
+
+                print(f"Average Response Time for {num_calls} calls: {average_response_time} seconds")
+
+                # Log the results
+
+                with open("log_file.txt", "a") as log_file:
+
+                    log_file.write(
+                        f"Search by Key-Value Pair - Average Response Time for {num_calls} calls: {average_response_time} seconds\n")
+
+                    log_file.write("---------------------------------------------------\n")
+
 
             elif choice == '3':
+
                 key_name = input("Enter the key name: ")
+
                 key_value_start = input("Enter the start value: ")
+
                 key_value_end = input("Enter the end value: ")
 
-                try:
-                    response_iterator = stub.searchRange(
-                        inventory_pb2.InventoryRangeRequest(
-                            key_name=key_name,
-                            key_value_start=key_value_start,
-                            key_value_end=key_value_end
+                # Initialize variables for timing and response times
+
+                total_time = 0
+
+                num_calls = 100
+
+                for _ in range(num_calls):
+
+                    start_time = time()  # Start timing
+
+                    try:
+
+                        response_iterator = stub.searchRange(
+
+                            inventory_pb2.InventoryRangeRequest(
+
+                                key_name=key_name,
+
+                                key_value_start=key_value_start,
+
+                                key_value_end=key_value_end
+
+                            )
+
                         )
-                    )
 
-                    print("\nResult from gRPC server:")
-                    print("gRPC server response details:")
-                    for response in response_iterator:
-                        print(f"Inventory_ID: {response.Inventory_ID}")
-                        print(f"Name: {response.Name}")
-                        print(f"Description: {response.Description}")
-                        print(f"Price: {response.Price}")
-                        print(f"Quantity_in_Stock: {response.Quantity_in_Stock}")
-                        print(f"Quantity_in_Reorder: {response.Quantity_in_Reorder}")
-                        print(f"Discontinued: {response.Discontinued}")
+                        end_time = time()  # End timing
 
-                except grpc.RpcError as e:
-                    print(f"Error: {e}")
+                        print("\nResult from gRPC server:")
+
+                        print("gRPC server response details:")
+
+                        for response in response_iterator:
+                            print(f"Inventory_ID: {response.Inventory_ID}")
+
+                            print(f"Name: {response.Name}")
+
+                            print(f"Description: {response.Description}")
+
+                            print(f"Price: {response.Price}")
+
+                            print(f"Quantity_in_Stock: {response.Quantity_in_Stock}")
+
+                            print(f"Quantity_in_Reorder: {response.Quantity_in_Reorder}")
+
+                            print(f"Discontinued: {response.Discontinued}")
+
+
+                    except grpc.RpcError as e:
+
+                        print(f"Error: {e}")
+
+                    # Calculate and log the response time
+
+                    response_time = end_time - start_time
+
+                    total_time += response_time
+
+                    print(f"Response time: {response_time} seconds")
+
+                # Calculate and print the average response time
+
+                average_response_time = total_time / num_calls
+
+                print(f"Average Response Time for {num_calls} calls: {average_response_time} seconds")
+
+                # Log the results
+
+                with open("log_file.txt", "a") as log_file:
+
+                    log_file.write(
+                        f"Search within a Range - Average Response Time for {num_calls} calls: {average_response_time} seconds\n")
+
+                    log_file.write("---------------------------------------------------\n")
+
 
             elif choice == '4':
+
                 key_name = input("Enter the key name: ")
+
                 percentile = float(input("Enter the percentile: "))
+
+                # Initialize variables for timing and response times
+
+                total_time = 0
+
+                num_calls = 100
+
+                for _ in range(num_calls):
+                    start_time = time()  # Start timing
+
                 try:
-                    response = stub.getDistribution(inventory_pb2.DistributionRequest(key_name=key_name, percentile=percentile))
+
+                    response = stub.getDistribution(
+                        inventory_pb2.DistributionRequest(key_name=key_name, percentile=percentile))
+
+                    end_time = time()  # End timing
+
                     print("\nResult from gRPC server:")
+
                     print("gRPC server response details:")
+
                     print(f"Percentile Value: {response.value}")
+
+                    # Calculate and log the response time
+
+                    response_time = end_time - start_time
+
+                    total_time += response_time
+
+                    print(f"Response time: {response_time} seconds")
+
                 except grpc.RpcError as e:
+
                     print(f"Error: {e}")
+
+                # Calculate and print the average response time
+
+                average_response_time = total_time / num_calls
+
+                print(f"Average Response Time for {num_calls} calls: {average_response_time} seconds")
+
+                # Log the results
+
+                with open("log_file.txt", "a") as log_file:
+
+                    log_file.write(
+                        f"Calculate Percentile - Average Response Time for {num_calls} calls: {average_response_time} seconds\n")
+
+                    log_file.write("---------------------------------------------------\n")
+
 
             elif choice == '5':
+
                 key_name = input("Enter the key name: ")
+
                 key_value = input("Enter the key value: ")
+
                 val_name = input("Enter the attribute name to update: ")
+
                 val_val_new = input("Enter the new value: ")
 
-                try:
-                    response = stub.update(inventory_pb2.UpdateRequest(
-                        key_name=key_name,
-                        key_value=key_value,
-                        val_name=val_name,
-                        val_val_new=val_val_new
-                    ))
+                # Initialize variables for timing and response times
 
-                    if response.success:
-                        print("\nUpdate successful.")
-                    else:
-                        print("Update failed. Record not found on the gRPC server.")
-                except grpc.RpcError as e:
-                    print(f"Error: {e}")
+                total_time = 0
+
+                num_calls = 100
+
+                for _ in range(num_calls):
+
+                    start_time = time()  # Start timing
+
+                    try:
+
+                        response = stub.update(inventory_pb2.UpdateRequest(
+
+                            key_name=key_name,
+
+                            key_value=key_value,
+
+                            val_name=val_name,
+
+                            val_val_new=val_val_new
+
+                        ))
+
+                        end_time = time()  # End timing
+
+                        if response.success:
+
+                            print("\nUpdate successful.")
+
+                        else:
+
+                            print("Update failed. Record not found on the gRPC server.")
+
+                        # Calculate and log the response time
+
+                        response_time = end_time - start_time
+
+                        total_time += response_time
+
+                        print(f"Response time: {response_time} seconds")
+
+                    except grpc.RpcError as e:
+
+                        print(f"Error: {e}")
+
+                # Calculate and print the average response time
+
+                average_response_time = total_time / num_calls
+
+                print(f"Average Response Time for {num_calls} calls: {average_response_time} seconds")
+
+                # Log the results
+
+                with open("log_file.txt", "a") as log_file:
+
+                    log_file.write(
+                        f"Update Value - Average Response Time for {num_calls} calls: {average_response_time} seconds\n")
+
+                    log_file.write("---------------------------------------------------\n")
 
             elif choice =='6':
                 print("Exiting Program")
