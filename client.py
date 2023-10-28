@@ -1,7 +1,15 @@
 import inventory_pb2_grpc
+from time import time
 import inventory_pb2
 import grpc
 import pandas as pd
+
+def requestResponseData(stub, method, *args):
+    start_time = time()
+    response = method(*args)
+    end_time = time()
+    response_time = end_time - start_time
+    return response, response_time
 
 def search_in_excel(file_path):
     df = pd.read_excel(file_path)
@@ -9,7 +17,7 @@ def search_in_excel(file_path):
     return result
 
 def run():
-    with grpc.insecure_channel('https://54.160.226.4') as channel:
+    with grpc.insecure_channel('54.160.226.4:50051') as channel:
         stub = inventory_pb2_grpc.InventoryServiceStub(channel)
         excel_file_path = r'InventoryData.xlsx'
 
