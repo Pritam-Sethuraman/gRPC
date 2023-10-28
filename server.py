@@ -190,7 +190,7 @@ def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     inventory_service = InventoryServiceServicer(excel_file_path)
     inventory_pb2_grpc.add_InventoryServiceServicer_to_server(inventory_service, server)
-    server.add_insecure_port("localhost:50051")
+    server.add_insecure_port('https://54.160.226.4')
     server.start()
     server.wait_for_termination()
 

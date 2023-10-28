@@ -9,7 +9,7 @@ def search_in_excel(file_path):
     return result
 
 def run():
-    with grpc.insecure_channel('localhost:50051') as channel:
+    with grpc.insecure_channel('https://54.160.226.4') as channel:
         stub = inventory_pb2_grpc.InventoryServiceStub(channel)
         excel_file_path = r'InventoryData.xlsx'
 
