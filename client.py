@@ -1,10 +1,11 @@
+import statistics
 import inventory_pb2_grpc
 from time import time
 import inventory_pb2
 import grpc
 import pandas as pd
 
-def requestResponseData(stub, method, *args):
+def requestResponseData(method, *args):
     start_time = time()
     response = method(*args)
     end_time = time()
@@ -39,17 +40,18 @@ def run():
             if choice == '1':
                 inventory_id = input("Enter the Inventory ID to search: ")
 
-                # Initialize variables for timing and response times
-                total_time = 0
+                # Initialize a list to store response times
+                response_times = []
+
                 num_calls = 100
 
                 for _ in range(num_calls):
                     start_time = time()  # Start timing
 
-                    # Search for the Inventory ID on the gRPC server
                     try:
-                        response = stub.searchByID(inventory_pb2.InventoryRequest(id=inventory_id))
-                        end_time = time()  # End timing
+                        response, response_time = requestResponseData(
+                            stub.searchByID, inventory_pb2.InventoryRequest(id=inventory_id)
+                        )
 
                         if response.Inventory_ID:
                             print("\nResult from gRPC server:")
@@ -62,9 +64,9 @@ def run():
                             print(f"Quantity_in_Reorder: {response.Quantity_in_Reorder}")
                             print(f"Discontinued: {response.Discontinued}")
 
-                        # Calculate and log the response time
-                        response_time = end_time - start_time
-                        total_time += response_time
+                        # Append the response time to the list
+                        response_times.append(response_time)
+
                         print(f"Response time: {response_time} seconds")
                     except grpc.RpcError as e:
                         # Handle NOT_FOUND error
@@ -73,14 +75,19 @@ def run():
                         else:
                             print(f"Error: {e}")
 
-                # Calculate and print the average response time
-                average_response_time = total_time / num_calls
+                # Calculate and print the average response time and standard deviation
+                average_response_time = sum(response_times) / num_calls
+                std_deviation = statistics.stdev(response_times)
+
                 print(f"Average Response Time for {num_calls} calls: {average_response_time} seconds")
+                print(f"Standard Deviation for {num_calls} calls: {std_deviation} seconds")
 
                 # Log the results
                 with open("log_file.txt", "a") as log_file:
                     log_file.write(
                         f"Search by ID - Average Response Time for {num_calls} calls: {average_response_time} seconds\n")
+                    log_file.write(
+                        f"Search by ID - Standard Deviation for {num_calls} calls: {std_deviation} seconds\n")
                     log_file.write("---------------------------------------------------\n")
 
 
@@ -90,9 +97,9 @@ def run():
 
                 key_value = input("Enter the key value: ")
 
-                # Initialize variables for timing and response times
+                # Initialize a list to store response times
 
-                total_time = 0
+                response_times = []
 
                 num_calls = 100
 
@@ -102,10 +109,11 @@ def run():
 
                     try:
 
-                        response = stub.search(
-                            inventory_pb2.InventorySearchRequest(key_name=key_name, key_value=key_value))
+                        response, response_time = requestResponseData(
 
-                        end_time = time()  # End timing
+                            stub.search, inventory_pb2.InventorySearchRequest(key_name=key_name, key_value=key_value)
+
+                        )
 
                         if response.Inventory_ID:
                             print("\nResult from gRPC server:")
@@ -126,17 +134,13 @@ def run():
 
                             print(f"Discontinued: {response.Discontinued}")
 
-                        # Calculate and log the response time
+                        # Append the response time to the list
 
-                        response_time = end_time - start_time
-
-                        total_time += response_time
+                        response_times.append(response_time)
 
                         print(f"Response time: {response_time} seconds")
 
                     except grpc.RpcError as e:
-
-                        # Handle NOT_FOUND error
 
                         if e.code() == grpc.StatusCode.NOT_FOUND:
 
@@ -146,20 +150,25 @@ def run():
 
                             print(f"Error: {e}")
 
-                # Calculate and print the average response time
+                # Calculate and print the average response time and standard deviation
 
-                average_response_time = total_time / num_calls
+                average_response_time = sum(response_times) / num_calls
+
+                std_deviation = statistics.stdev(response_times)
 
                 print(f"Average Response Time for {num_calls} calls: {average_response_time} seconds")
+
+                print(f"Standard Deviation for {num_calls} calls: {std_deviation} seconds")
 
                 # Log the results
 
                 with open("log_file.txt", "a") as log_file:
-
                     log_file.write(
                         f"Search by Key-Value Pair - Average Response Time for {num_calls} calls: {average_response_time} seconds\n")
-
+                    log_file.write(
+                        f"Search by Key-Value Pair - Standard Deviation for {num_calls} calls: {std_deviation} seconds\n")
                     log_file.write("---------------------------------------------------\n")
+
 
 
             elif choice == '3':
@@ -170,9 +179,9 @@ def run():
 
                 key_value_end = input("Enter the end value: ")
 
-                # Initialize variables for timing and response times
+                # Initialize a list to store response times
 
-                total_time = 0
+                response_times = []
 
                 num_calls = 100
 
@@ -182,9 +191,9 @@ def run():
 
                     try:
 
-                        response_iterator = stub.searchRange(
+                        response_iterator, response_time = requestResponseData(
 
-                            inventory_pb2.InventoryRangeRequest(
+                            stub.searchRange, inventory_pb2.InventoryRangeRequest(
 
                                 key_name=key_name,
 
@@ -195,8 +204,6 @@ def run():
                             )
 
                         )
-
-                        end_time = time()  # End timing
 
                         print("\nResult from gRPC server:")
 
@@ -217,24 +224,25 @@ def run():
 
                             print(f"Discontinued: {response.Discontinued}")
 
+                        # Append the response time to the list
+
+                        response_times.append(response_time)
+
+                        print(f"Response time: {response_time} seconds")
 
                     except grpc.RpcError as e:
 
                         print(f"Error: {e}")
 
-                    # Calculate and log the response time
+                # Calculate and print the average response time and standard deviation
 
-                    response_time = end_time - start_time
+                average_response_time = sum(response_times) / num_calls
 
-                    total_time += response_time
-
-                    print(f"Response time: {response_time} seconds")
-
-                # Calculate and print the average response time
-
-                average_response_time = total_time / num_calls
+                std_deviation = statistics.stdev(response_times)
 
                 print(f"Average Response Time for {num_calls} calls: {average_response_time} seconds")
+
+                print(f"Standard Deviation for {num_calls} calls: {std_deviation} seconds")
 
                 # Log the results
 
@@ -243,7 +251,11 @@ def run():
                     log_file.write(
                         f"Search within a Range - Average Response Time for {num_calls} calls: {average_response_time} seconds\n")
 
+                    log_file.write(
+                        f"Search within a Range - Standard Deviation for {num_calls} calls: {std_deviation} seconds\n")
+
                     log_file.write("---------------------------------------------------\n")
+
 
 
             elif choice == '4':
@@ -252,45 +264,50 @@ def run():
 
                 percentile = float(input("Enter the percentile: "))
 
-                # Initialize variables for timing and response times
+                # Initialize a list to store response times
 
-                total_time = 0
+                response_times = []
 
                 num_calls = 100
 
                 for _ in range(num_calls):
+
                     start_time = time()  # Start timing
 
-                try:
+                    try:
 
-                    response = stub.getDistribution(
-                        inventory_pb2.DistributionRequest(key_name=key_name, percentile=percentile))
+                        response, response_time = requestResponseData(
 
-                    end_time = time()  # End timing
+                            stub.getDistribution,
+                            inventory_pb2.DistributionRequest(key_name=key_name, percentile=percentile)
 
-                    print("\nResult from gRPC server:")
+                        )
 
-                    print("gRPC server response details:")
+                        print("\nResult from gRPC server:")
 
-                    print(f"Percentile Value: {response.value}")
+                        print("gRPC server response details:")
 
-                    # Calculate and log the response time
+                        print(f"Percentile Value: {response.value}")
 
-                    response_time = end_time - start_time
+                        # Append the response time to the list
 
-                    total_time += response_time
+                        response_times.append(response_time)
 
-                    print(f"Response time: {response_time} seconds")
+                        print(f"Response time: {response_time} seconds")
 
-                except grpc.RpcError as e:
+                    except grpc.RpcError as e:
 
-                    print(f"Error: {e}")
+                        print(f"Error: {e}")
 
-                # Calculate and print the average response time
+                # Calculate and print the average response time and standard deviation
 
-                average_response_time = total_time / num_calls
+                average_response_time = sum(response_times) / num_calls
+
+                std_deviation = statistics.stdev(response_times)
 
                 print(f"Average Response Time for {num_calls} calls: {average_response_time} seconds")
+
+                print(f"Standard Deviation for {num_calls} calls: {std_deviation} seconds")
 
                 # Log the results
 
@@ -299,7 +316,11 @@ def run():
                     log_file.write(
                         f"Calculate Percentile - Average Response Time for {num_calls} calls: {average_response_time} seconds\n")
 
+                    log_file.write(
+                        f"Calculate Percentile - Standard Deviation for {num_calls} calls: {std_deviation} seconds\n")
+
                     log_file.write("---------------------------------------------------\n")
+
 
 
             elif choice == '5':
@@ -312,9 +333,9 @@ def run():
 
                 val_val_new = input("Enter the new value: ")
 
-                # Initialize variables for timing and response times
+                # Initialize a list to store response times
 
-                total_time = 0
+                response_times = []
 
                 num_calls = 100
 
@@ -324,19 +345,21 @@ def run():
 
                     try:
 
-                        response = stub.update(inventory_pb2.UpdateRequest(
+                        response, response_time = requestResponseData(
 
-                            key_name=key_name,
+                            stub.update, inventory_pb2.UpdateRequest(
 
-                            key_value=key_value,
+                                key_name=key_name,
 
-                            val_name=val_name,
+                                key_value=key_value,
 
-                            val_val_new=val_val_new
+                                val_name=val_name,
 
-                        ))
+                                val_val_new=val_val_new
 
-                        end_time = time()  # End timing
+                            )
+
+                        )
 
                         if response.success:
 
@@ -346,11 +369,9 @@ def run():
 
                             print("Update failed. Record not found on the gRPC server.")
 
-                        # Calculate and log the response time
+                        # Append the response time to the list
 
-                        response_time = end_time - start_time
-
-                        total_time += response_time
+                        response_times.append(response_time)
 
                         print(f"Response time: {response_time} seconds")
 
@@ -358,11 +379,15 @@ def run():
 
                         print(f"Error: {e}")
 
-                # Calculate and print the average response time
+                # Calculate and print the average response time and standard deviation
 
-                average_response_time = total_time / num_calls
+                average_response_time = sum(response_times) / num_calls
+
+                std_deviation = statistics.stdev(response_times)
 
                 print(f"Average Response Time for {num_calls} calls: {average_response_time} seconds")
+
+                print(f"Standard Deviation for {num_calls} calls: {std_deviation} seconds")
 
                 # Log the results
 
@@ -370,6 +395,9 @@ def run():
 
                     log_file.write(
                         f"Update Value - Average Response Time for {num_calls} calls: {average_response_time} seconds\n")
+
+                    log_file.write(
+                        f"Update Value - Standard Deviation for {num_calls} calls: {std_deviation} seconds\n")
 
                     log_file.write("---------------------------------------------------\n")
 
